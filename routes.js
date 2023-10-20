@@ -10,7 +10,7 @@ const Reservation = require("./models/reservation");
 
 const router = new express.Router();
 
-/** Homepage: show list of customers. 
+/** Homepage: show list of customers.
  *  Show filtered customers on search.
  */
 
@@ -60,6 +60,10 @@ router.get("/:id/", async function (req, res, next) {
   const customer = await Customer.get(req.params.id);
 
   const reservations = await customer.getReservations();
+
+  console.log("reserve", reservations[0].numGuests)
+  reservations[0].numGuests = 15;
+  console.log("reserve", reservations[0].numGuests)
 
   return res.render("customer_detail.html", { customer, reservations });
 });

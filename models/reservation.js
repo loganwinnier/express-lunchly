@@ -3,6 +3,7 @@
 /** Reservation for Lunchly */
 
 const moment = require("moment");
+const { BadRequestError } = require("../expressError");
 
 const db = require("../db");
 
@@ -12,7 +13,7 @@ class Reservation {
   constructor({ id, customerId, numGuests, startAt, notes }) {
     this.id = id;
     this.customerId = customerId;
-    this.numGuests = numGuests;
+    this._numGuests = numGuests;
     this.startAt = startAt;
     this.notes = notes;
   }
@@ -67,6 +68,16 @@ class Reservation {
       ],
       );
     }
+  }
+
+  get numGuests(){
+    return this._numGuests;
+  }
+
+  set numGuests(num){
+    if(num < 1) throw new BadRequestError("Number of guest must be 1 or greater.");
+
+    this._numGuests = num;
   }
 }
 

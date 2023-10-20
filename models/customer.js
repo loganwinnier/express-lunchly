@@ -13,7 +13,7 @@ class Customer {
     this.firstName = firstName;
     this.lastName = lastName;
     this.phone = phone;
-    this.notes = notes;
+    this._notes = notes;
   }
 
   /** find all customers. */
@@ -97,6 +97,10 @@ class Customer {
     return `${this.firstName} ${this.lastName}`;
   }
 
+  get fullName(){
+    return `${this.firstName} ${this.lastName}`;
+  }
+
   /** get customers by name from searchTerm */
 
   static async searchByName(searchTerm) {
@@ -108,7 +112,7 @@ class Customer {
                   phone,
                   notes
            FROM customers
-           WHERE first_name ILIKE $1 OR last_name ILIKE $1 OR 
+           WHERE first_name ILIKE $1 OR last_name ILIKE $1 OR
            CONCAT(first_name,' ',last_name) ILIKE $1
            ORDER BY last_name, first_name`,
       ['%' + searchTerm + '%']
@@ -134,6 +138,14 @@ class Customer {
     );
 
     return results.rows.map(c => new Customer(c));
+  }
+
+  get notes(){
+    return this._notes;
+  }
+
+  set notes(val){
+    this._notes = val || "";
   }
 
 }
