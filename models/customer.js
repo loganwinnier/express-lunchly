@@ -96,6 +96,41 @@ class Customer {
   getFullName() {
     return `${this.firstName} ${this.lastName}`;
   }
+
+  static async searchByName(searchTerm){
+
+    const results = await db.query(
+      `SELECT id,
+                  first_name AS "firstName",
+                  last_name  AS "lastName",
+                  phone,
+                  notes
+           FROM customers
+           WHERE first_name ILIKE $1 OR last_name ILIKE $1`,
+           ['%' + searchTerm + '%']
+    );
+    return results.rows.map(c => new Customer(c));
+  }
+
+  /**Get top ten customers with most reservations */
+  static async getTopTen(){
+    const results = await db.query(
+      `SELECT customers.id,
+                  first_name AS "firstName",
+                  last_name  AS "lastName",
+                  phone,
+                  customers.notes
+           FROM reservations
+           JOIN customers
+           ON (reservations.customer_id = customers.id)
+           GROUP BY customers.id
+           ORDER BY COUNT(*) DESC
+           LIMIT 10`
+    );
+
+    return results.rows.map(c => new Customer(c));
+  }
+
 }
 
 module.exports = Customer;
