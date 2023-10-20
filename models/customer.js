@@ -97,25 +97,22 @@ class Customer {
     return `${this.firstName} ${this.lastName}`;
   }
 
-  get fullName(){
+  get fullName() {
     return `${this.firstName} ${this.lastName}`;
   }
 
   /** get customers by name from searchTerm */
 
   static async searchByName(searchTerm) {
-
+    const formatSearch = searchTerm.trim().split(" ").join('<->');
+    console.log(formatSearch);
     const results = await db.query(
-      `SELECT id,
-                  first_name AS "firstName",
-                  last_name  AS "lastName",
-                  phone,
-                  notes
-           FROM customers
-           WHERE first_name ILIKE $1 OR last_name ILIKE $1 OR
-           CONCAT(first_name,' ',last_name) ILIKE $1
-           ORDER BY last_name, first_name`,
-      ['%' + searchTerm + '%']
+      `SELECT first_name AS "firstName", last_name AS "lastName"
+      FROM customers 
+      WHERE to_tsvector('english', first_name || ' ' || last_name) 
+      @@ to_tsquery('english', $1)`,
+      [formatSearch + ':*']
+
     );
     return results.rows.map(c => new Customer(c));
   }
@@ -140,11 +137,11 @@ class Customer {
     return results.rows.map(c => new Customer(c));
   }
 
-  get notes(){
+  get notes() {
     return this._notes;
   }
 
-  set notes(val){
+  set notes(val) {
     this._notes = val || "";
   }
 

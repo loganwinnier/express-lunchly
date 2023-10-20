@@ -3,6 +3,7 @@
 /** Routes for Lunchly */
 
 const express = require("express");
+const moment = require("moment");
 
 const { BadRequestError } = require("./expressError");
 const Customer = require("./models/customer");
@@ -61,11 +62,8 @@ router.get("/:id/", async function (req, res, next) {
 
   const reservations = await customer.getReservations();
 
-  console.log("reserve", reservations[0].numGuests)
-  reservations[0].numGuests = 15;
-  console.log("reserve", reservations[0].numGuests)
-
-  return res.render("customer_detail.html", { customer, reservations });
+  const mostRecentRes = moment(reservations[0].startAt, "YYYYMMDD").fromNow();
+  return res.render("customer_detail.html", { customer, reservations, mostRecentRes });
 });
 
 /** Show form to edit a customer. */

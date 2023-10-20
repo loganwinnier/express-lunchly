@@ -3,7 +3,7 @@
 /** Reservation for Lunchly */
 
 const moment = require("moment");
-const { BadRequestError } = require("../expressError");
+const { BadRequestError, UnauthorizedError } = require("../expressError");
 
 const db = require("../db");
 
@@ -12,9 +12,9 @@ const db = require("../db");
 class Reservation {
   constructor({ id, customerId, numGuests, startAt, notes }) {
     this.id = id;
-    this.customerId = customerId;
+    this._customerId = customerId;
     this._numGuests = numGuests;
-    this.startAt = startAt;
+    this._startAt = startAt;
     this.notes = notes;
   }
 
@@ -70,14 +70,37 @@ class Reservation {
     }
   }
 
-  get numGuests(){
+  get numGuests() {
     return this._numGuests;
   }
 
-  set numGuests(num){
-    if(num < 1) throw new BadRequestError("Number of guest must be 1 or greater.");
+  set numGuests(num) {
+    if (num < 1) throw new BadRequestError("Number of guest must be 1 or greater.");
 
     this._numGuests = num;
+  }
+
+  get startAt() {
+    return this._startAt;
+  }
+
+  set startAt(input) {
+
+    const date = new Date(input);
+    console.log("Date=", date, (date));
+    if (isNaN(date)) {
+      throw new BadRequestError("Must input a date");
+    }
+
+    return this._startAt = date;
+  }
+
+  get customerId() {
+    return this._customerId;
+  }
+
+  set customerId(id) {
+    throw new UnauthorizedError("Not allowed to change customer id on reservations");
   }
 }
 

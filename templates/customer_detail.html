@@ -22,8 +22,13 @@
         <ul>
           {% for reservation in reservations %}
             <li>
+              {% if loop.first %}
+              <b>{{ mostRecentRes }}</b>
+              for {{ reservation.numGuests }}
+              {% else %}
               <b>{{ reservation.getFormattedStartAt() }}</b>
               for {{ reservation.numGuests }}
+              {% endif %}
             </li>
           {% endfor %}
         </ul>
