@@ -97,7 +97,9 @@ class Customer {
     return `${this.firstName} ${this.lastName}`;
   }
 
-  static async searchByName(searchTerm){
+  /** get customers by name from searchTerm */
+
+  static async searchByName(searchTerm) {
 
     const results = await db.query(
       `SELECT id,
@@ -106,14 +108,17 @@ class Customer {
                   phone,
                   notes
            FROM customers
-           WHERE first_name ILIKE $1 OR last_name ILIKE $1`,
-           ['%' + searchTerm + '%']
+           WHERE first_name ILIKE $1 OR last_name ILIKE $1 OR 
+           CONCAT(first_name,' ',last_name) ILIKE $1
+           ORDER BY last_name, first_name`,
+      ['%' + searchTerm + '%']
     );
     return results.rows.map(c => new Customer(c));
   }
 
   /**Get top ten customers with most reservations */
-  static async getTopTen(){
+
+  static async getTopTen() {
     const results = await db.query(
       `SELECT customers.id,
                   first_name AS "firstName",
